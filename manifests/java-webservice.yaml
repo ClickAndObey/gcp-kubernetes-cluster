@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-webservice
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-webservice
+  template:
+    metadata:
+      labels:
+        app: java-webservice
+    spec:
+      containers:
+      - name: java-webservice
+        image: ghcr.io/clickandobey/java-dockerized-webservice:1.0.2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9001
+        - containerPort: 9002
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-webservice
+  namespace: apps
+spec:
+  selector:
+    app: java-webservice
+  ports:
+    - name: service
+      port: 9001
+      targetPort: 9001
+      protocol: TCP
+    - name: admin
+      port: 9002
+      targetPort: 9002
+      protocol: TCP
