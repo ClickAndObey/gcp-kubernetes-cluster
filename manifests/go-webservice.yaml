@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: go-webservice
-        image: ghcr.io/clickandobey/golang-dockerized-webservice:1.0.3
+        image: ghcr.io/clickandobey/golang-dockerized-webservice:1.0.4
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9001
