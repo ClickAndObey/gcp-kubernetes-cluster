@@ -5,6 +5,17 @@ MINOR_VERSION := 0
 BUILD_VERSION ?= $(USER)
 VERSION := $(MAJOR_VERSION).$(MINOR_VERSION).$(BUILD_VERSION)
 
+ORGANIZATION := clickandobey
+SERVICE_NAME := gcp-kubernetes-cluster
+
+GCP_TERRAFORM_DOCKER_IMAGE_NAME := ghcr.io/clickandobey/gcp-terraform-docker:1.0.0
+
+ifneq ($(GITHUB_ACTION),)
+  INTERACTIVE=--env "INTERACTIVE=None"
+else
+  INTERACTIVE=--interactive
+endif
+
 # Local Setup
 
 init-minikube:
@@ -37,6 +48,21 @@ port-forward-java:
 port-forward-python:
 	@kubectl port-forward --namespace apps service/python-webservice 9001:9001
 
+# Terraform
+
+dev-terraform-plan:
+	@docker run \
+		--rm \
+		${INTERACTIVE} \
+		--env ENVIRONMENT=dev \
+		--env TERRAFORM_DIRECTORY=/terraform \
+		--env REGION=us-west1 \
+		--env SERVICE_NAME=${SERVICE_NAME} \
+		-v `pwd`/terraform:/terraform \
+		-v $(HOME)/.gcp:/root/.gcp \
+		${GCP_TERRAFORM_DOCKER_IMAGE_NAME} \
+			plan
+
 # Testing
 
 test:
@@ -56,7 +82,17 @@ lint-markdown:
 	@echo Markdown linting complete.
 
 lint-terraform:
-	@echo TODO Implement Me!
+	@docker run \
+		--rm \
+		${INTERACTIVE} \
+		--env ENVIRONMENT=dev \
+		--env TERRAFORM_DIRECTORY=/terraform \
+		--env REGION=us-west1 \
+		--env SERVICE_NAME=${SERVICE_NAME} \
+		-v `pwd`/terraform:/terraform \
+		-v $(HOME)/.gcp:/root/.gcp \
+		${GCP_TERRAFORM_DOCKER_IMAGE_NAME} \
+			fmt -check=true -diff=true
 
 # Utilities
 

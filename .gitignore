@@ -30,3 +30,8 @@ override.tf.json
 
 # IDEA Files
 .idea/
+
+# Terraform Files
+.terraform*
+terraform.tfstate
+*.tfvars
